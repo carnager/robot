@@ -53,6 +53,7 @@ addTags () {
     elif [[ "$tags" == "Add some Tags to your bookmark (seperate with comma)" ]]; then
         confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Continue without Tags? > ")
         if [[ "$confirm" == "1  Yes" ]]; then
+            tags="none"
             addName
         elif [[ "$confirm" == "2  No" ]]; then
             addTags
