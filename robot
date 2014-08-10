@@ -30,6 +30,7 @@ addCategory () {
     elif [[ "$category" == "No Category" ]]; then
         confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Continue without Category? > ")
         if [[ "$confirm" == "1  Yes" ]]; then
+            category="none"
             addTags
         elif [[ "$confirm" == "2  No" ]]; then
             addCategory
@@ -44,6 +45,7 @@ addTags () {
     if [[ "$tags" == "" ]]; then
         confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Continue without Tags? > ")
         if [[ "$confirm" == "1  Yes" ]]; then
+            tags="none"
             addName
         elif [[ "$confirm" == "2  No" ]]; then
             addTags
