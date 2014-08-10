@@ -4,8 +4,8 @@ source $HOME/.config/robot/config
 
 cd $bmark_dir
 browseBookmarks () {
-    bookmark="$(echo -e "$(cat bookmarks | awk -F ' @@ ' '{ print $1, $4, $3 }' | rofi -dmenu -p "Choose Bookmark > ")")"
-    bmark=$(echo "$bookmark" | cut -d ' ' -f1)
+    bookmark="$(cat bookmarks | awk -F ' @@ ' '{ printf "%3s %-20s %59s\n", $1, $4, $3 }' | rofi -width 30 -dmenu -p "Choose Bookmark > ")"
+    bmark=$(echo "$bookmark" | awk '{ print $1 }')
     if [[ "$bookmark" == "" ]]; then
         exit
     else
