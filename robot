@@ -30,7 +30,7 @@ addCategory () {
     elif [[ "$category" == "No Category" ]]; then
         confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Continue without Category? > ")
         if [[ "$confirm" == "1  Yes" ]]; then
-            category="none"
+            category="#none"
             addTags
         elif [[ "$confirm" == "2  No" ]]; then
             addCategory
@@ -41,19 +41,13 @@ addCategory () {
 }
 
 addTags () {
-    tags=$(echo -e "Add some Tags to your bookmark (seperate with comma)" | rofi -dmenu -p "Add Tags > ")
+    tags=$(echo -e "No Tags" | rofi -dmenu -p "Add Tags > ")
     if [[ "$tags" == "" ]]; then
+        exit
+    elif [[ "$tags" == "No Tags" ]]; then
         confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Continue without Tags? > ")
         if [[ "$confirm" == "1  Yes" ]]; then
-            tags="none"
-            addName
-        elif [[ "$confirm" == "2  No" ]]; then
-            addTags
-        fi
-    elif [[ "$tags" == "Add some Tags to your bookmark (seperate with comma)" ]]; then
-        confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Continue without Tags? > ")
-        if [[ "$confirm" == "1  Yes" ]]; then
-            tags="none"
+            tags="#none"
             addName
         elif [[ "$confirm" == "2  No" ]]; then
             addTags
