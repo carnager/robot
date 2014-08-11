@@ -46,6 +46,9 @@ editBookmarks () {
             sed -i "/^id=$id/d" "$bmark_dir"/bookmarks
             addCategory
             echo "id=$id @@ $bookmark @@ $tags @@ $name @@ $category" >> bookmarks
+            sorted=$(sort -t "=" -k2 -n bookmarks)
+            rm -f "$bmark_dir"/bookmarks
+            echo "$sorted" > "$bmark_dir"/bookmarks
         fi
     done < <(echo -e "Mode: Edit\n---\n$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-78s  %20s %6s\n", $4, $3, $5, $1 }')" | rofi -dmenu -p "Choose Bookmark > ")
 }
