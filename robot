@@ -3,17 +3,53 @@
 source $HOME/.config/robot/config
 
 cd $bmark_dir
-browseBookmarks () {
+openBookmarks () {
     while read bookmark
     do
-        bmark=$(echo "$bookmark" | awk '{ print $4 }')
+        bmark=$(echo "$bookmark" | awk -F 'id=' '{ print $2 }')
         if [[ "$bookmark" == "" ]]; then
             exit
+        elif [[ "$bookmark" == "Mode: Open" ]]; then
+            copyBookmarks
         else
             chromium $(cat bookmarks | grep "$bmark" | awk -F ' @@ ' '{ print $2 }')
         fi
-    done < <(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-81s  %20s %3s\n", $4, $3, $5, $1 }' | rofi -dmenu -p "Choose Bookmark > ")
+    done < <(echo -e "Mode: Open\n---\n$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-78s  %20s %6s\n", $4, $3, $5, $1 }')" | rofi -dmenu -p "Choose Bookmark > ")
 }
+
+copyBookmarks () {
+    while read bookmark
+    do
+        bmark=$(echo "$bookmark" | awk -F 'id=' '{ print $2 }')
+        if [[ "$bookmark" == "" ]]; then
+            exit
+        elif [[ "$bookmark" == "Mode: Copy" ]]; then
+            editBookmarks
+        else
+            echo -n $(cat bookmarks | grep "$bmark" | awk -F ' @@ ' '{ print $2 }') | xclip && xclip -o | xclip -selection clipboard
+        fi
+    done < <(echo -e "Mode: Copy\n---\n$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-78s  %20s %6s\n", $4, $3, $5, $1 }')" | rofi -dmenu -p "Choose Bookmark > ")
+}
+
+editBookmarks () {
+    while read bookmark
+    do
+        bmark=$(echo "$bookmark" | awk -F 'id=' '{ print $2 }')
+        if [[ "$bookmark" == "" ]]; then
+            exit
+        elif [[ "$bookmark" == "Mode: Edit" ]]; then
+            openBookmarks
+        else
+            echo $bmark
+            id=$bmark
+            bookmark=$(cat bookmarks | grep "$bmark" | awk -F ' @@ ' '{ print $2 }')
+            sed -i "/^id=$id/d" "$bmark_dir"/bookmarks
+            addCategory
+            echo "id=$id @@ $bookmark @@ $tags @@ $name @@ $category" >> bookmarks
+        fi
+    done < <(echo -e "Mode: Edit\n---\n$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-78s  %20s %6s\n", $4, $3, $5, $1 }')" | rofi -dmenu -p "Choose Bookmark > ")
+}
+
 
 addBookmarks () {
     bookmark=$(echo -e "Use ctrl+v to paste bookmark" | rofi -dmenu -p "Add Bookmark > ")
@@ -74,16 +110,17 @@ addName () {
         exit
     elif [[ "$name" == "Please Enter the Display Name for the bookmark" ]]; then
         addName
-    else
-        id=$(cat bookmarks | wc -l)
-        echo "$(( $id + 1 )) @@ $bookmark @@ $tags @@ $name @@ $category" >> bookmarks
+#    else
+        #echo "$(( $id + 1 )) @@ $bookmark @@ $tags @@ $name @@ $category" >> bookmarks
     fi
 }
 
 if [[ $1 == "add" ]]; then
     addBookmarks
+    id=$(cat bookmarks | wc -l)
+    echo "id=$(( $id + 1 )) @@ $bookmark @@ $tags @@ $name @@ $category" >> bookmarks
 elif [[ $1 == "list" ]]; then
-    browseBookmarks
+    openBookmarks
 else
     echo "Please use the "add" or "list" arguments"
 fi
