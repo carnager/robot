@@ -4,13 +4,15 @@ source $HOME/.config/robot/config
 
 cd $bmark_dir
 browseBookmarks () {
-    bookmark="$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-50s  %20s %3s\n", $4, $3, $5, $1 }' | rofi -dmenu -p "Choose Bookmark > ")"
-    bmark=$(echo "$bookmark" | awk '{ print $4 }')
-    if [[ "$bookmark" == "" ]]; then
-        exit
-    else
-        chromium $(cat bookmarks | grep "$bmark" | awk -F ' @@ ' '{ print $2 }')
-    fi
+    while read bookmark
+    do
+        bmark=$(echo "$bookmark" | awk '{ print $4 }')
+        if [[ "$bookmark" == "" ]]; then
+            exit
+        else
+            chromium $(cat bookmarks | grep "$bmark" | awk -F ' @@ ' '{ print $2 }')
+        fi
+    done < <(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-81s  %20s %3s\n", $4, $3, $5, $1 }' | rofi -dmenu -p "Choose Bookmark > ")
 }
 
 addBookmarks () {
