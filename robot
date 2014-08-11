@@ -12,7 +12,7 @@ openBookmarks () {
         elif [[ "$bookmark" == "Mode: Open" ]]; then
             copyBookmarks
         else
-            chromium $(cat bookmarks | grep "$bmark" | awk -F ' @@ ' '{ print $2 }')
+            chromium $(cat bookmarks | grep "^id=$bmark" | awk -F ' @@ ' '{ print $2 }')
         fi
     done < <(echo -e "Mode: Open\n---\n$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-78s  %20s %6s\n", $4, $3, $5, $1 }')" | rofi -dmenu -p "Choose Bookmark > ")
 }
@@ -26,7 +26,8 @@ copyBookmarks () {
         elif [[ "$bookmark" == "Mode: Copy" ]]; then
             editBookmarks
         else
-            echo -n $(cat bookmarks | grep "$bmark" | awk -F ' @@ ' '{ print $2 }') | xclip && xclip -o | xclip -selection clipboard
+            echo "id=$bmark"
+            echo -n $(cat bookmarks | grep "^id=$bmark" | awk -F ' @@ ' '{ print $2 }') | xclip && xclip -o | xclip -selection clipboard
         fi
     done < <(echo -e "Mode: Copy\n---\n$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-78s  %20s %6s\n", $4, $3, $5, $1 }')" | rofi -dmenu -p "Choose Bookmark > ")
 }
@@ -40,9 +41,8 @@ editBookmarks () {
         elif [[ "$bookmark" == "Mode: Edit" ]]; then
             openBookmarks
         else
-            echo $bmark
             id=$bmark
-            bookmark=$(cat bookmarks | grep "$bmark" | awk -F ' @@ ' '{ print $2 }')
+            bookmark=$(cat bookmarks | grep "^id=$bmark" | awk -F ' @@ ' '{ print $2 }')
             sed -i "/^id=$id/d" "$bmark_dir"/bookmarks
             addCategory
             echo "id=$id @@ $bookmark @@ $tags @@ $name @@ $category" >> bookmarks
