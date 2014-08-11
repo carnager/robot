@@ -17,6 +17,15 @@ addBookmarks () {
     bookmark=$(echo -e "Use ctrl+v to paste bookmark" | rofi -dmenu -p "Add Bookmark > ")
     if [[ "$bookmark" == "" ]]; then
         exit
+    elif [[ "$bookmark" == "Use ctrl+v to paste bookmark" ]]; then
+        confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Use $(xclip -selection clipboard -o)?")
+        if [[ "$confirm" == "1  Yes" ]]; then
+            bookmark=$(xclip -selection clipboard -o)
+            notify-send "robot" "Using $(xclip -selection clipboard -o) as URL"
+            addCategory
+        elif [[ "$confirm" == "2  No" ]]; then
+            addBookmarks
+        fi
     else
         addCategory
     fi
