@@ -5,7 +5,6 @@ import json
 import sys
 import argparse
 import configparser
-import itertools
 
 config = configparser.ConfigParser()
 try:
