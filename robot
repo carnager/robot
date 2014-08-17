@@ -11,17 +11,15 @@ config.read(os.environ["HOME"] + "/.config/robot/config")
 bmarks = config['general']['bmarks']
 
 def listURL(args):
+    bookmarkfile = open(str(bmarks), 'r')
+    bookmarks = json.loads(bookmarkfile.read(), 'r')
+    bookmarkfile.close
+
     if args.group:
-        bookmarkfile = open(str(bmarks), 'r')
-        bookmarks = json.loads(bookmarkfile.read(), 'r')
-        bookmarkfile.close
         url = [bookmark['name'] + "   " + bookmark['url'] + "   " + ', '.join(bookmark['tags']) + "   " + bookmark['group'] for bookmark in bookmarks if bookmark['group'] == str(args.group)]
         print("\n".join(url))
 
     if args.tag:
-        bookmarkfile = open(str(bmarks), 'r')
-        bookmarks = json.loads(bookmarkfile.read(), 'r')
-        bookmarkfile.close
         url = [bookmark['name'] + "   " + bookmark['url'] + "   " + ', '.join(bookmark['tags']) + "   " + bookmark['group'] for bookmark in bookmarks if args.tag in bookmark['tags']]
         print("\n".join(url))
 
@@ -47,24 +45,19 @@ def addBmarks(args):
 
 
 def findUrlbyName(args):
+    bookmarkfile = open(str(bmarks), 'r')
+    bookmarks = json.loads(bookmarkfile.read(), 'r')
+    bookmarkfile.close
+
     if args.name:
-        bookmarkfile = open(str(bmarks), 'r')
-        bookmarks = json.loads(bookmarkfile.read(), 'r')
-        bookmarkfile.close
         url = [bookmark['url'] for bookmark in bookmarks if bookmark['name'] == str(args.name)]
         print(", ".join(url))
 
     if args.group:
-        bookmarkfile = open(str(bmarks), 'r')
-        bookmarks = json.loads(bookmarkfile.read(), 'r')
-        bookmarkfile.close
         url = [bookmark['url'] for bookmark in bookmarks if bookmark['group'] == str(args.group)]
         print("\n".join(url))
 
     if args.tag:
-        bookmarkfile = open(str(bmarks), 'r')
-        bookmarks = json.loads(bookmarkfile.read(), 'r')
-        bookmarkfile.close
         url = [bookmark['url'] for bookmark in bookmarks if args.tag in bookmark['tags']]
         print("\n".join(url))
 
