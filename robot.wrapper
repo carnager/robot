@@ -132,6 +132,21 @@ addBmark() {
     fi
 }
 
+showHelp() {
+    echo "---"
+    echo " robot: rofi bookmark tool"
+    echo " Copyright © 2014 Rasmus Steinke"
+    echo "---"
+    echo "Options"
+    echo ""
+    echo "General"
+    echo "   -h            this help message"
+    echo "   list          show all bookmarks"
+    echo "   add           add a bookmark"
+    echo "   listtags      list all tags"
+    echo "   listgroups    list all groups"
+}
+
 if [[ "$1" == "list" ]]; then
     listBmarks
 elif [[ "$1" == "add" ]]; then
@@ -140,6 +155,8 @@ elif [[ "$1" == "listtags" ]]; then
     getTags
 elif [[ "$1" == "listgroups" ]]; then
     getGroups
+elif [[ "$1" == "-h" ]]; then
+    showHelp
 else
     mainMenu
 fi
