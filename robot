@@ -8,7 +8,12 @@ import configparser
 import itertools
 
 config = configparser.ConfigParser()
-config.read(os.environ["HOME"] + "/.config/robot/config")
+try:
+    config.read(os.environ["HOME"] + "/.config/robot/config")
+except FileNotFoundError:
+    print("No config file found. Exiting...")
+    sys.exit()
+
 bmarks = config['general']['bmarks']
 try:
     open(bmarks, 'r')
