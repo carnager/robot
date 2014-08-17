@@ -15,6 +15,8 @@ try:
 except FileNotFoundError:
     open(bmarks, 'w+').write('[]')
     print("No bookmarkfile found - creating empty one")
+    print("Please run robot again")
+    sys.exit()
 
 
 def listURL(args):
@@ -116,4 +118,7 @@ parser_add.add_argument('--group', help="Group of bookmark")
 parser_add.add_argument('--tag', nargs="?", help="Tag of bookmark")
 
 args = parser.parse_args()
-args.call(args)
+try:
+    args.call(args)
+except AttributeError:
+    print("No or wrong arguments given. Run robot -h for help")
