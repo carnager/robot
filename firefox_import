@@ -18,6 +18,11 @@ fp_data.close()
 config = configparser.ConfigParser()
 config.read(os.environ["HOME"] + "/.config/robot/config")
 bmarks = config['general']['bmarks']
+try:
+    open(bmarks, 'r')
+except FileNotFoundError:
+    open(bmarks, 'w+').write('[]')
+    print("No bookmarkfile found - creating empty one")
 
 
 #Recursive function to get the title and URL keys from JSON file
