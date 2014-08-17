@@ -1,0 +1,23 @@
+#!/usr/bin/env python2
+
+import json
+
+bookmarkfile = open('firefox_bookmarks.json')
+bookmarks = json.load(bookmarkfile)
+
+
+bookmarks = [x['children'] for x in bookmarks['children']]
+for x in bookmarks:
+    foo = [{k: v for k, v in d.items() if k in ['name', 'uri', 'title', 'tags']} for d in x]
+
+#print("Original")
+#print("")
+#print(bla)
+#print("")
+#print("output")
+#print("")
+print(foo)
+
+
+#bookmarkfile = open(str('output.json'), 'w')
+
