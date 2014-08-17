@@ -68,6 +68,14 @@ def findUrlbyName(args):
         url = [bookmark['url'] for bookmark in bookmarks if args.tag in bookmark['tags']]
         print("\n".join(url))
 
+
+def getGroups(args):
+        bookmarkfile = open(str(bmarks), 'r')
+        bookmarks = json.loads(bookmarkfile.read(), 'r')
+        bookmarkfile.close
+        groups = [bookmark['group'] for bookmark in bookmarks]
+        print("\n".join(groups))
+
 parser = argparse.ArgumentParser(prog='robot', description='Simple bookmark tool')
 subparsers = parser.add_subparsers()
 
@@ -78,6 +86,9 @@ parser_list.add_argument('--tag', help="List bookmarks by Tags")
 
 parser_listall = subparsers.add_parser('listall', help="list all bookmarks")
 parser_listall.set_defaults(call=listAll)
+
+parser_getgroup = subparsers.add_parser('getgroups', help="List all Groups")
+parser_getgroup.set_defaults(call=getGroups)
 
 parser_add = subparsers.add_parser('add', help="Add a bookmark")
 parser_add.set_defaults(call=addBmarks)
