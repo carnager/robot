@@ -113,6 +113,10 @@ if [[ "$1" == "list" ]]; then
     listBmarks
 elif [[ "$1" == "add" ]]; then
     addBmarks
+elif [[ "$1" == "listtags" ]]; then
+    getTags
+elif [[ "$1" == "listgroups" ]]; then
+    getGroups
 else
     mainMenu
 fi
