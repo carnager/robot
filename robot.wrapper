@@ -1,0 +1,118 @@
+#!/bin/bash
+
+browser=chromium
+
+mainMenu () {
+    menu=("Q  Exit Robot"
+          "---"
+          "1  List Bookmarks"
+          "2  Add Bookmark")
+
+    prompt() {
+        printf "%s\n" "$@" | rofi -dmenu -p "robot > "
+    }
+
+    case "$(prompt "${menu[@]}")" in
+        1*) listBmarks ;;
+        2*) AddBmark ;;
+        Q) exit ;;
+          *) exit
+    esac
+}
+
+listBmarks() {
+    declare -i seen=0
+    while read line
+    do
+        seen=1
+        if [[ "$line" == "0  Return to Main Menu" ]]; then
+            mainMenu
+        elif [[ "$line" == "List Groups" ]]; then
+            getGroups
+        elif [[ "$line" == "" ]]; then
+            return
+        else
+            name="$(echo "$line" | awk -F '   ' '{print $1}')"
+            "$browser" $(robot geturl --name "$name")
+        fi
+    done < <(echo -e "0  Return to Main Menu\n---\nList Groups\n---\n$(robot listall)" | awk -F '   ' '{ printf "%-30s  %-45s  %-40s %6s\n", $1, $2, $3, $4 }' | rofi -dmenu -width -121 -p '> ')
+
+    if [[  $seen = 0 ]]; then
+        exit
+    fi
+}
+
+getGroups() {
+    groups=$(robot getgroups | sort | uniq)
+    group=$(echo -e "0  Return to Main Menu\n---\nList Tags\n---\n$(echo "$groups")" | rofi -dmenu -p 'Select Group > ')
+    if [[ "$group" == "0  Return to Main Menu" ]]; then
+        mainMenu
+    elif [[ "$group" == "List Tags" ]]; then
+        getTags
+    elif [[ "$group" == "" ]]; then
+        return
+    else
+        listBmarksGroup
+    fi
+}
+
+getTags() {
+    tags=$(robot gettags | sort | uniq)
+    tag=$(echo -e "0  Return to Main Menu\n---\nList All\n---\n$(echo "$tags")" | rofi -dmenu -p 'Select Group > ')
+    if [[ "$tag" == "0  Return to Main Menu" ]]; then
+        mainMenu
+    elif [[ "$tag" == "List All" ]]; then
+        listBmarks
+    elif [[ "$tag" == "" ]]; then
+        return
+    else
+        listBmarksTags
+    fi
+}
+
+listBmarksGroup() {
+    declare -i seen=0
+    while read line
+    do
+        seen=1
+        if [[ "$line" == "0  Return to Main Menu" ]]; then
+            mainMenu
+        elif [[ "$line" == "List Tags" ]]; then
+            getTags
+        elif [[ "$line" == "" ]]; then
+            return
+        else
+            name="$(echo "$line" | awk -F '   ' '{print $1}')"
+            "$browser" $(robot geturl --name "$name")
+        fi
+    done < <(echo -e "0  Return to Main Menu\n---\n$(robot list --group "$group")" | awk -F '   ' '{ printf "%-30s  %-45s  %-40s %6s\n", $1, $2, $3, $4 }' | rofi -dmenu -width -121 -p '> ')
+
+    if [[  $seen = 0 ]]; then
+        exit
+    fi
+}
+
+listBmarksTags() {
+    declare -i seen=0
+    while read line
+    do
+        seen=1
+        if [[ "$line" == "0  Return to Main Menu" ]]; then
+            mainMenu
+        elif [[ "$line" == "List All" ]]; then
+            listBmarks
+        elif [[ "$line" == "" ]]; then
+            return
+        else
+            name="$(echo "$line" | awk -F '   ' '{print $1}')"
+            "$browser" $(robot geturl --name "$name")
+        fi
+    done < <(echo -e "0  Return to Main Menu\n---\n$(robot list --tag "$tag")" | awk -F '   ' '{ printf "%-30s  %-45s  %-40s %6s\n", $1, $2, $3, $4 }' | rofi -dmenu -width -121 -p '> ')
+
+    if [[  $seen = 0 ]]; then
+        exit
+    fi
+}
+
+
+mainMenu

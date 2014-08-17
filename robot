@@ -5,6 +5,7 @@ import json
 import sys
 import argparse
 import configparser
+import itertools
 
 config = configparser.ConfigParser()
 config.read(os.environ["HOME"] + "/.config/robot/config")
@@ -69,6 +70,14 @@ def getGroups(args):
         groups = [bookmark['group'] for bookmark in bookmarks]
         print("\n".join(groups))
 
+def getTags(args):
+        bookmarkfile = open(str(bmarks), 'r')
+        bookmarks = json.loads(bookmarkfile.read(), 'r')
+        bookmarkfile.close
+        tags = [bookmark['tags'] for bookmark in bookmarks]
+        foo = [item for sublist in tags for item in sublist]
+        print("\n".join(foo))
+
 parser = argparse.ArgumentParser(prog='robot', description='Simple bookmark tool')
 subparsers = parser.add_subparsers()
 
@@ -82,6 +91,9 @@ parser_listall.set_defaults(call=listAll)
 
 parser_getgroup = subparsers.add_parser('getgroups', help="List all Groups")
 parser_getgroup.set_defaults(call=getGroups)
+
+parser_gettags = subparsers.add_parser('gettags', help="List all Tags")
+parser_gettags.set_defaults(call=getTags)
 
 parser_add = subparsers.add_parser('add', help="Add a bookmark")
 parser_add.set_defaults(call=addBmarks)
