@@ -12,7 +12,12 @@ import configparser
 
 bookmarks_path='firefox_bookmarks.json'
 
-fp_data = io.open(bookmarks_path, encoding='utf-8')
+try:
+    fp_data = io.open(bookmarks_path, encoding='utf-8')
+except FileNotFoundError:
+    print("Firefox json file not found. Please Backup the file with name \"firefox_bookmarks.json\"")
+    sys.exit()
+
 jdata = json.load(fp_data)
 fp_data.close()
 config = configparser.ConfigParser()
