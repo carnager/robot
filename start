@@ -4,12 +4,12 @@ browser=$(grep browser $HOME/.config/robot/config | awk -F '=' '{print $2}')
 echo "$browser"
 
 bookmarkOpen() {
-    menu=$(./robot list | awk -F '   ' '{ printf "%-30s  %-45s  %-40s %6s\n", $1, $2, $3, $4 }' | rofi -dmenu -width -121 -p '> ')
+    menu=$(robot list | awk -F '   ' '{ printf "%-30s  %-45s  %-40s %6s\n", $1, $2, $3, $4 }' | rofi -dmenu -width -121 -p '> ')
     if [[ "$menu" == "" ]]; then
         exit
     else
         name="$(echo "$menu" | awk -F '   ' '{print $1}')"
-        "$browser" $(./robot geturl --name "$name")
+        "$browser" $(robot geturl --name "$name")
     fi
 }
 
@@ -30,7 +30,7 @@ bookmarkAdd() {
                 if [[ "$tags" == "" ]]; then
                     exit
                 else
-                    ./robot add --url "$url" --name "$name" --group "$group" --tags "$tags"
+                    robot add --url "$url" --name "$name" --group "$group" --tags "$tags"
                 fi
             fi
         fi
