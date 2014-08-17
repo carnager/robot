@@ -14,7 +14,7 @@ mainMenu () {
 
     case "$(prompt "${menu[@]}")" in
         1*) listBmarks ;;
-        2*) AddBmark ;;
+        2*) addBmark ;;
         Q) exit ;;
           *) exit
     esac
