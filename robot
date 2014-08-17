@@ -1,129 +1,73 @@
-#!/bin/bash
+#!/usr/bin/env python
 
-source $HOME/.config/robot/config
+import os
+import json
+import sys
+import argparse
+import configparser
 
-cd $bmark_dir
-openBookmarks () {
-    while read bookmark
-    do
-        bmark=$(echo "$bookmark" | awk -F 'id=' '{ print $2 }')
-        if [[ "$bookmark" == "" ]]; then
-            exit
-        elif [[ "$bookmark" == "Mode: Open" ]]; then
-            copyBookmarks
-        else
-            chromium $(cat bookmarks | grep "^id=$bmark" | awk -F ' @@ ' '{ print $2 }')
-        fi
-    done < <(echo -e "Mode: Open\n---\n$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-78s  %20s %6s\n", $4, $3, $5, $1 }')" | rofi -dmenu -p "Choose Bookmark > ")
-}
+config = configparser.ConfigParser()
+config.read(os.environ["HOME"] + "/.config/robot/config")
+bmarks = config['general']['bmarks']
 
-copyBookmarks () {
-    while read bookmark
-    do
-        bmark=$(echo "$bookmark" | awk -F 'id=' '{ print $2 }')
-        if [[ "$bookmark" == "" ]]; then
-            exit
-        elif [[ "$bookmark" == "Mode: Copy" ]]; then
-            editBookmarks
-        else
-            echo "id=$bmark"
-            echo -n $(cat bookmarks | grep "^id=$bmark" | awk -F ' @@ ' '{ print $2 }') | xclip && xclip -o | xclip -selection clipboard
-        fi
-    done < <(echo -e "Mode: Copy\n---\n$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-78s  %20s %6s\n", $4, $3, $5, $1 }')" | rofi -dmenu -p "Choose Bookmark > ")
-}
+def listBmarks(args):
+    bookmarkfile = open(str(bmarks))
+    bookmarks = json.loads(bookmarkfile.read())
 
-editBookmarks () {
-    while read bookmark
-    do
-        bmark=$(echo "$bookmark" | awk -F 'id=' '{ print $2 }')
-        if [[ "$bookmark" == "" ]]; then
-            exit
-        elif [[ "$bookmark" == "Mode: Edit" ]]; then
-            openBookmarks
-        else
-            id=$bmark
-            bookmark=$(cat bookmarks | grep "^id=$bmark" | awk -F ' @@ ' '{ print $2 }')
-            sed -i "/^id=$id/d" "$bmark_dir"/bookmarks
-            addCategory
-            echo "id=$id @@ $bookmark @@ $tags @@ $name @@ $category" >> bookmarks
-            sorted=$(sort -t "=" -k2 -n bookmarks)
-            rm -f "$bmark_dir"/bookmarks
-            echo "$sorted" > "$bmark_dir"/bookmarks
-        fi
-    done < <(echo -e "Mode: Edit\n---\n$(cat bookmarks | awk -F ' @@ ' '{ printf "%-30s  %-78s  %20s %6s\n", $4, $3, $5, $1 }')" | rofi -dmenu -p "Choose Bookmark > ")
-}
+    for x in bookmarks:
+        print(x['name'] + "   " + x['url'] +"   " + ', '.join(x['tags']) + "   " + x['group'])
+
+def addBmarks(args):
+    bookmarkfile = open(str(bmarks), 'r')
+    bookmarks = json.loads(bookmarkfile.read(), 'r')
+    bookmarkfile.close
+    bookmarkfile = open(str(bmarks), 'w')
+    bookmarks.append({"name": str(args.name), "url": str(args.url), "group": str(args.group), "tags": args.tags.split(" ")})
+    bookmarks_final = json.dumps(bookmarks, sort_keys=True, indent=4, separators=(',', ': '))
+    with open("bookmarks", "w") as text_file:
+        print((bookmarks_final), file=bookmarkfile)
 
 
-addBookmarks () {
-    bookmark=$(echo -e "Use ctrl+v to paste bookmark" | rofi -dmenu -p "Add Bookmark > ")
-    if [[ "$bookmark" == "" ]]; then
-        exit
-    elif [[ "$bookmark" == "Use ctrl+v to paste bookmark" ]]; then
-        confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Use $(xclip -selection clipboard -o)?")
-        if [[ "$confirm" == "1  Yes" ]]; then
-            bookmark=$(xclip -selection clipboard -o)
-            notify-send "robot" "Using $(xclip -selection clipboard -o) as URL"
-            addCategory
-        elif [[ "$confirm" == "2  No" ]]; then
-            addBookmarks
-        fi
-    else
-        addCategory
-    fi
-}
+def findUrlbyName(args):
+    if args.name:
+        bookmarkfile = open(str(bmarks), 'r')
+        bookmarks = json.loads(bookmarkfile.read(), 'r')
+        bookmarkfile.close
+        url = [bookmark['url'] for bookmark in bookmarks if bookmark['name'] == str(args.name)]
+        print(", ".join(url))
 
+    if args.group:
+        bookmarkfile = open(str(bmarks), 'r')
+        bookmarks = json.loads(bookmarkfile.read(), 'r')
+        bookmarkfile.close
+        url = [bookmark['url'] for bookmark in bookmarks if bookmark['group'] == str(args.group)]
+        print(", ".join(url))
 
-addCategory () {
-    category=$(echo -e "No Category" | rofi -dmenu -p "Add Category > ")
-    if [[ "$category" == "" ]]; then
-        exit
-    elif [[ "$category" == "No Category" ]]; then
-        confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Continue without Category? > ")
-        if [[ "$confirm" == "1  Yes" ]]; then
-            category="#none"
-            addTags
-        elif [[ "$confirm" == "2  No" ]]; then
-            addCategory
-        fi
-    else
-        addTags
-    fi
-}
+    if args.tag:
+        bookmarkfile = open(str(bmarks), 'r')
+        bookmarks = json.loads(bookmarkfile.read(), 'r')
+        bookmarkfile.close
+        url = [bookmark['url'] for bookmark in bookmarks if args.tag in bookmark['tags']]
+        print("\n".join(url))
 
-addTags () {
-    tags=$(echo -e "No Tags" | rofi -dmenu -p "Add Tags > ")
-    if [[ "$tags" == "" ]]; then
-        exit
-    elif [[ "$tags" == "No Tags" ]]; then
-        confirm=$(echo -e "1  Yes\n2  No" | rofi -dmenu -p "Continue without Tags? > ")
-        if [[ "$confirm" == "1  Yes" ]]; then
-            tags="#none"
-            addName
-        elif [[ "$confirm" == "2  No" ]]; then
-            addTags
-        fi
-    else
-        addName
-    fi
-}
+parser = argparse.ArgumentParser(prog='robot', description='Simple bookmark tool')
+subparsers = parser.add_subparsers()
 
-addName () {
-    name=$(echo -e "Please Enter the Display Name for the bookmark" | rofi -dmenu -p "Name > ")
-    if [[ "$name" == "" ]]; then
-        exit
-    elif [[ "$name" == "Please Enter the Display Name for the bookmark" ]]; then
-        addName
-#    else
-        #echo "$(( $id + 1 )) @@ $bookmark @@ $tags @@ $name @@ $category" >> bookmarks
-    fi
-}
+parser_list = subparsers.add_parser('list', help="list all bookmarks")
+parser_list.set_defaults(call=listBmarks)
 
-if [[ $1 == "add" ]]; then
-    addBookmarks
-    id=$(cat bookmarks | wc -l)
-    echo "id=$(( $id + 1 )) @@ $bookmark @@ $tags @@ $name @@ $category" >> bookmarks
-elif [[ $1 == "list" ]]; then
-    openBookmarks
-else
-    echo "Please use the "add" or "list" arguments"
-fi
+parser_add = subparsers.add_parser('add', help="Add a bookmark")
+parser_add.set_defaults(call=addBmarks)
+parser_add.add_argument('--url', help="URL of bookmark")
+parser_add.add_argument('--name', help="Name of bookmark")
+parser_add.add_argument('--tags', help="tags of bookmark")
+parser_add.add_argument('--group', help="group of bookmark")
+
+parser_add = subparsers.add_parser('geturl', help="find url for matching name")
+parser_add.set_defaults(call=findUrlbyName)
+parser_add.add_argument('--name', help="Name of bookmark")
+parser_add.add_argument('--group', help="Group of bookmark")
+parser_add.add_argument('--tag', nargs="?", help="Tag of bookmark")
+
+args = parser.parse_args()
+args.call(args)

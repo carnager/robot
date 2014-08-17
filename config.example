@@ -1,2 +1,3 @@
-bmark_dir=$HOME/Documents/bookmarks
+[general]
+bmarks=$HOME/Documents/bookmarks
 browser=chromium
