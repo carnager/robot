@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-'''extract a list of URLs from Firefox exported bookmars JSON file '''
+'''extract a list of URLs from Firefox exported bookmars JSON file
+   Base for this was found on the linux freelancer blog
+   http://linuxfreelancer.com/
+'''
 
 import json
 import os
