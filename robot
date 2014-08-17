@@ -10,9 +10,27 @@ config = configparser.ConfigParser()
 config.read(os.environ["HOME"] + "/.config/robot/config")
 bmarks = config['general']['bmarks']
 
-def listBmarks(args):
+def listURL(args):
+    if args.group:
+        bookmarkfile = open(str(bmarks), 'r')
+        bookmarks = json.loads(bookmarkfile.read(), 'r')
+        bookmarkfile.close
+        url = [bookmark['name'] + "   " + bookmark['url'] + "   " + ', '.join(bookmark['tags']) + "   " + bookmark['group'] for bookmark in bookmarks if bookmark['group'] == str(args.group)]
+        print("\n".join(url))
+
+    if args.tag:
+        bookmarkfile = open(str(bmarks), 'r')
+        bookmarks = json.loads(bookmarkfile.read(), 'r')
+        bookmarkfile.close
+        url = [bookmark['name'] + "   " + bookmark['url'] + "   " + ', '.join(bookmark['tags']) + "   " + bookmark['group'] for bookmark in bookmarks if args.tag in bookmark['tags']]
+        print("\n".join(url))
+
+
+
+def listAll(args):
     bookmarkfile = open(str(bmarks))
     bookmarks = json.loads(bookmarkfile.read())
+    bookmarkfile.close
 
     for x in bookmarks:
         print(x['name'] + "   " + x['url'] +"   " + ', '.join(x['tags']) + "   " + x['group'])
@@ -41,7 +59,7 @@ def findUrlbyName(args):
         bookmarks = json.loads(bookmarkfile.read(), 'r')
         bookmarkfile.close
         url = [bookmark['url'] for bookmark in bookmarks if bookmark['group'] == str(args.group)]
-        print(", ".join(url))
+        print("\n".join(url))
 
     if args.tag:
         bookmarkfile = open(str(bmarks), 'r')
@@ -53,8 +71,13 @@ def findUrlbyName(args):
 parser = argparse.ArgumentParser(prog='robot', description='Simple bookmark tool')
 subparsers = parser.add_subparsers()
 
-parser_list = subparsers.add_parser('list', help="list all bookmarks")
-parser_list.set_defaults(call=listBmarks)
+parser_list = subparsers.add_parser('list', help="list bookmarks by filter")
+parser_list.set_defaults(call=listURL)
+parser_list.add_argument('--group', help="List bookmarks by Groups")
+parser_list.add_argument('--tag', help="List bookmarks by Tags")
+
+parser_listall = subparsers.add_parser('listall', help="list all bookmarks")
+parser_listall.set_defaults(call=listAll)
 
 parser_add = subparsers.add_parser('add', help="Add a bookmark")
 parser_add.set_defaults(call=addBmarks)
