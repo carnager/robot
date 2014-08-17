@@ -108,11 +108,34 @@ listBmarksTags() {
     fi
 }
 
+addBmark() {
+    url=$(echo "Enter URL (CTRL-V to paste)" | rofi -dmenu -width -121 -p '> ')
+    if [[ "$url" == "" ]]; then
+        exit
+    else
+        name=$(echo "Enter Name" | rofi -dmenu -width -121 -p '> ')
+        if [[ "$name" == "" ]]; then
+            exit
+        else
+            group=$(echo "Enter Group" | rofi -dmenu -width -121 -p '> ')
+            if [[ "$group" == "" ]]; then
+                exit
+            else
+                tags=$(echo "Enter Tags (format: #tag1 #tag2" | rofi -dmenu -width -121 -p '> ')
+                if [[ "$tags" == "" ]]; then
+                    exit
+                else
+                    robot add --url "$url" --name "$name" --group "$group" --tags "$tags"
+                fi
+            fi
+        fi
+    fi
+}
 
 if [[ "$1" == "list" ]]; then
     listBmarks
 elif [[ "$1" == "add" ]]; then
-    addBmarks
+    addBmark
 elif [[ "$1" == "listtags" ]]; then
     getTags
 elif [[ "$1" == "listgroups" ]]; then
