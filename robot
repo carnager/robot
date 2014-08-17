@@ -10,6 +10,12 @@ import itertools
 config = configparser.ConfigParser()
 config.read(os.environ["HOME"] + "/.config/robot/config")
 bmarks = config['general']['bmarks']
+try:
+    open(bmarks, 'r')
+except FileNotFoundError:
+    open(bmarks, 'w+').write('[]')
+    print("No bookmarkfile found - creating empty one")
+
 
 def listURL(args):
     bookmarkfile = open(str(bmarks), 'r')
@@ -75,8 +81,9 @@ def getTags(args):
         bookmarks = json.loads(bookmarkfile.read(), 'r')
         bookmarkfile.close
         tags = [bookmark['tags'] for bookmark in bookmarks]
-        foo = [item for sublist in tags for item in sublist]
-        print("\n".join(foo))
+        tags = [item for sublist in tags for item in sublist]
+        print("\n".join(tags))
+
 
 parser = argparse.ArgumentParser(prog='robot', description='Simple bookmark tool')
 subparsers = parser.add_subparsers()

@@ -29,13 +29,15 @@ listBmarks() {
             mainMenu
         elif [[ "$line" == "List Groups" ]]; then
             getGroups
+        elif [[ "$line" == "List Tags" ]]; then
+            getTags
         elif [[ "$line" == "" ]]; then
             return
         else
             name="$(echo "$line" | awk -F '   ' '{print $1}')"
             "$browser" $(robot geturl --name "$name")
         fi
-    done < <(echo -e "0  Return to Main Menu\n---\nList Groups\n---\n$(robot listall)" | awk -F '   ' '{ printf "%-30s  %-45s  %-40s %6s\n", $1, $2, $3, $4 }' | rofi -dmenu -width -121 -p '> ')
+    done < <(echo -e "0  Return to Main Menu\n---\nList Groups\nList Tags\n---\n$(robot listall)" | awk -F '   ' '{ printf "%-30s  %-45s  %-40s %6s\n", $1, $2, $3, $4 }' | rofi -dmenu -width -121 -p '> ')
 
     if [[  $seen = 0 ]]; then
         exit
@@ -44,13 +46,9 @@ listBmarks() {
 
 getGroups() {
     groups=$(robot getgroups | sort | uniq)
-    group=$(echo -e "0  Return to Main Menu\n---\nList Tags\n---\n$(echo "$groups")" | rofi -dmenu -p 'Select Group > ')
-    if [[ "$group" == "0  Return to Main Menu" ]]; then
-        mainMenu
-    elif [[ "$group" == "List Tags" ]]; then
-        getTags
-    elif [[ "$group" == "" ]]; then
-        return
+    group=$(echo -e "$(echo "$groups")" | rofi -dmenu -columns 3 -p 'Select Group > ')
+    if [[ "$group" == "" ]]; then
+        listBmarks
     else
         listBmarksGroup
     fi
@@ -58,13 +56,9 @@ getGroups() {
 
 getTags() {
     tags=$(robot gettags | sort | uniq)
-    tag=$(echo -e "0  Return to Main Menu\n---\nList All\n---\n$(echo "$tags")" | rofi -dmenu -p 'Select Group > ')
-    if [[ "$tag" == "0  Return to Main Menu" ]]; then
-        mainMenu
-    elif [[ "$tag" == "List All" ]]; then
+    tag=$(echo -e "$(echo "$tags")" | rofi -dmenu -columns 3 -p 'Select Tags > ')
+    if [[ "$tag" == "" ]]; then
         listBmarks
-    elif [[ "$tag" == "" ]]; then
-        return
     else
         listBmarksTags
     fi
@@ -115,4 +109,10 @@ listBmarksTags() {
 }
 
 
-mainMenu
+if [[ "$1" == "list" ]]; then
+    listBmarks
+elif [[ "$1" == "add" ]]; then
+    addBmarks
+else
+    mainMenu
+fi
