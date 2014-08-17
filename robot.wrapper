@@ -1,6 +1,6 @@
 #!/bin/bash
 
-browser=chromium
+browser="$(grep browser $HOME/.config/robot/config | awk -F '=' '{ print $2}')"
 
 mainMenu () {
     menu=("Q  Exit Robot"
