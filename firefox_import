@@ -9,6 +9,7 @@ import os
 import io
 import sys
 import configparser
+import shutil
 
 bookmarks_path='firefox_bookmarks.json'
 
@@ -18,11 +19,15 @@ fp_data.close()
 config = configparser.ConfigParser()
 config.read(os.environ["HOME"] + "/.config/robot/config")
 bmarks = config['general']['bmarks']
+print("Firefox bookmarks importer")
+print("---\n")
+print("Backing up original bookmarks file as backup.json")
 try:
-    open(bmarks, 'r')
+    shutil.copyfile(str(bmarks), 'backup.json')
+    print("   => [DONE]")
 except FileNotFoundError:
-    open(bmarks, 'w+').write('[]')
-    print("No bookmarkfile found - creating empty one")
+    print("   => [!] No bookmmark file found - creating empty one")
+    open(bmarks, 'w').write('[]')
 
 
 #Recursive function to get the title and URL keys from JSON file
@@ -38,8 +43,13 @@ def grab_keys(bookmarks_data, bookmarks_list=[]):
 
 def main():
     mydata=grab_keys(jdata)
-    bookmarkfile = open(str(bmarks), 'r')
-    bookmarks = json.loads(bookmarkfile.read(), 'r')
+    bookmarkfile = open((bmarks), 'r')
+    try:
+        bookmarks = json.loads(bookmarkfile.read(), 'r')
+    except ValueError:
+        open(bmarks, 'w').write('[]')
+        print("---\n   => [!!] No valid bookmarkfile found - creating empty one - please run again")
+        sys.exit()
     bookmarkfile.close
     bookmarkfile = open(str(bmarks), 'r')
     outputfile = open('output.json', 'w')
@@ -54,6 +64,8 @@ def main():
     with open("bookmarks", "w") as text_file:
         print((bookmarks_final), file=outputfile)
     bookmarkfile.close
+    print("\nBookmark file written to output.json")
+    print("You can now copy this file to " + str(bmarks))
 
 
 if __name__=="__main__":
