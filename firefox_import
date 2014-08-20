@@ -12,12 +12,7 @@ import configparser
 
 bookmarks_path='firefox_bookmarks.json'
 
-try:
-    fp_data = io.open(bookmarks_path, encoding='utf-8')
-except FileNotFoundError:
-    print("Firefox json file not found. Please Backup the file with name \"firefox_bookmarks.json\"")
-    sys.exit()
-
+fp_data = io.open(bookmarks_path, encoding='utf-8')
 jdata = json.load(fp_data)
 fp_data.close()
 config = configparser.ConfigParser()
@@ -46,7 +41,8 @@ def main():
     bookmarkfile = open(str(bmarks), 'r')
     bookmarks = json.loads(bookmarkfile.read(), 'r')
     bookmarkfile.close
-    bookmarkfile = open(str(bmarks), 'w')
+    bookmarkfile = open(str(bmarks), 'r')
+    outputfile = open('output.json', 'w')
     for item in mydata:
         tags = item['tags']
         title = item['title']
@@ -56,7 +52,7 @@ def main():
             bookmarks.append({"name": str(title), "url": str(url), "group": str(group), "tags": tags.split(",")})
             bookmarks_final = json.dumps(bookmarks, sort_keys=True, indent=4, separators=(',', ': '))
     with open("bookmarks", "w") as text_file:
-        print((bookmarks_final), file=bookmarkfile)
+        print((bookmarks_final), file=outputfile)
     bookmarkfile.close
 
 
