@@ -44,7 +44,7 @@ def listAll(args):
     bookmarkfile.close
 
     for x in bookmarks:
-        print(x['name'] + "   " + x['url'] +"   " + ', '.join(x['tags']) + "   " + x['group'])
+        print("%-40s    %77s   %15s" % (x['name'], ', '.join(x['tags']), x['group']))
 
 def addBmarks(args):
     bookmarkfile = open(str(bmarks), 'r')
