@@ -37,7 +37,7 @@ listBmarks() {
             name="$(echo "$line" | awk -F '   ' '{print $1}')"
             "$browser" $(robot geturl --name "$name")
         fi
-    done < <(echo -e "0  Return to Main Menu\n---\nList Groups\nList Tags\n---\n$(robot listall)" | awk -F '   ' '{ printf "%-30s  %-45s  %-40s %6s\n", $1, $2, $3, $4 }' | rofi -dmenu -width -121 -p '> ')
+    done < <(echo -e "0  Return to Main Menu\n---\nList Groups\nList Tags\n---\n$(robot listall)" | rofi -dmenu -p '> ')
 
     if [[  $seen = 0 ]]; then
         exit
