@@ -43,8 +43,13 @@ def listAll(args):
     bookmarks = json.loads(bookmarkfile.read())
     bookmarkfile.close
 
-    for x in bookmarks:
-        print("%-40s    %77s   %15s" % (x['name'], ', '.join(x['tags']), x['group']))
+    if args.urls:
+        for x in bookmarks:
+            print("%-40s  %-90s  %77s   %15s" % (x['name'], x['url'], ', '.join(x['tags']), x['group']))
+
+    else:
+        for x in bookmarks:
+            print("%-40s    %77s   %15s" % (x['name'], ', '.join(x['tags']), x['group']))
 
 def addBmarks(args):
     bookmarkfile = open(str(bmarks), 'r')
@@ -101,6 +106,7 @@ parser_list.add_argument('--tag', help="List bookmarks by Tags")
 
 parser_listall = subparsers.add_parser('listall', help="list all bookmarks")
 parser_listall.set_defaults(call=listAll)
+parser_listall.add_argument('--urls', help="Include URLs in list")
 
 parser_getgroup = subparsers.add_parser('getgroups', help="List all Groups")
 parser_getgroup.set_defaults(call=getGroups)
