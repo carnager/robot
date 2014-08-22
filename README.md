@@ -1,5 +1,5 @@
-# robot - really oafy bookmark organiser tool
-# (comes with robin - really odd bookmark interface)
+## robot - really oafy bookmark organiser tool
+#### (comes with robin - really odd bookmark interface)
 
 Simple tool to add or list bookmarks. bookmarks can be searched by title or tags.
 
