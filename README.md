@@ -12,7 +12,7 @@ robot will create the file on first run.
 Run robot -h to get all options.
 
 ## Dependencies:
-* python
+* python (or ruby for the ruby version, obviously)
 
 ##### for the rofi interface:
 * rofi
