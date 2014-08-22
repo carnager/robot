@@ -1,0 +1,5 @@
+#!/bin/bash
+
+file="$(grep bmarks $HOME/.config/robot/config | cut -d '=' -f2-)"
+cat $(echo "$file") | python -mjson.tool > /tmp/robot_bookmarks_clean
+mv -f /tmp/robot_bookmarks_clean $(echo "$file")
