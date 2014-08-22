@@ -26,7 +26,7 @@ except FileNotFoundError:
 def listURL(args):
     bookmarkfile = open(str(bmarks), 'r')
     bookmarks = json.loads(bookmarkfile.read(), 'r')
-    bookmarkfile.close
+    bookmarkfile.close()
 
     if args.group:
         url = [bookmark['name'] + "   " + bookmark['url'] + "   " + ', '.join(bookmark['tags']) + "   " + bookmark['group'] for bookmark in bookmarks if bookmark['group'] == str(args.group)]
@@ -41,7 +41,7 @@ def listURL(args):
 def listAll(args):
     bookmarkfile = open(str(bmarks))
     bookmarks = json.loads(bookmarkfile.read())
-    bookmarkfile.close
+    bookmarkfile.close()
 
     if args.urls:
         for x in bookmarks:
@@ -54,7 +54,7 @@ def listAll(args):
 def addBmarks(args):
     bookmarkfile = open(str(bmarks), 'r')
     bookmarks = json.loads(bookmarkfile.read(), 'r')
-    bookmarkfile.close
+    bookmarkfile.close()
     bookmarkfile = open(str(bmarks), 'w')
     bookmarks.append({"name": str(args.name), "url": str(args.url), "group": str(args.group), "tags": args.tags.split(" ")})
     bookmarks_final = json.dumps(bookmarks, sort_keys=True, indent=4, separators=(',', ': '))
@@ -65,35 +65,35 @@ def addBmarks(args):
 def findUrlbyName(args):
     bookmarkfile = open(str(bmarks), 'r')
     bookmarks = json.loads(bookmarkfile.read(), 'r')
-    bookmarkfile.close
+    bookmarkfile.close()
 
     if args.name:
         url = [bookmark['url'] for bookmark in bookmarks if bookmark['name'] == str(args.name)]
         print(", ".join(url))
 
-    if args.group:
+    elif args.group:
         url = [bookmark['url'] for bookmark in bookmarks if bookmark['group'] == str(args.group)]
         print("\n".join(url))
 
-    if args.tag:
+    elif args.tag:
         url = [bookmark['url'] for bookmark in bookmarks if args.tag in bookmark['tags']]
         print("\n".join(url))
 
 
 def getGroups(args):
-        bookmarkfile = open(str(bmarks), 'r')
-        bookmarks = json.loads(bookmarkfile.read(), 'r')
-        bookmarkfile.close
-        groups = [bookmark['group'] for bookmark in bookmarks]
-        print("\n".join(groups))
+    bookmarkfile = open(str(bmarks), 'r')
+    bookmarks = json.loads(bookmarkfile.read(), 'r')
+    bookmarkfile.close()
+    groups = [bookmark['group'] for bookmark in bookmarks]
+    print("\n".join(groups))
 
 def getTags(args):
-        bookmarkfile = open(str(bmarks), 'r')
-        bookmarks = json.loads(bookmarkfile.read(), 'r')
-        bookmarkfile.close
-        tags = [bookmark['tags'] for bookmark in bookmarks]
-        tags = [item for sublist in tags for item in sublist]
-        print("\n".join(tags))
+    bookmarkfile = open(str(bmarks), 'r')
+    bookmarks = json.loads(bookmarkfile.read(), 'r')
+    bookmarkfile.close()
+    tags = [bookmark['tags'] for bookmark in bookmarks]
+    tags = [item for sublist in tags for item in sublist]
+    print("\n".join(tags))
 
 
 parser = argparse.ArgumentParser(prog='robot', description='Simple bookmark tool')
