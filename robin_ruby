@@ -99,7 +99,7 @@ listBmarksTags() {
             return
         else
             name="$(echo "$line" | awk -F '   ' '{print $1}')"
-            "$browser" $(robot --type --name --geturl "$name")
+            "$browser" $(robot --type name --geturl "$name")
         fi
     done < <(echo -e "0  Return to Main Menu\n---\n$(robot --type tag --list "$tag")" | rofi -dmenu -width -121 -p '> ')
 
