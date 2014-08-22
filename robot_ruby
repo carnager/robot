@@ -1,0 +1,46 @@
+#!/usr/bin/ruby
+
+require 'rubygems'
+require 'json'
+require 'pp'
+require 'optparse'
+
+
+bookmarkpath = '/home/carnager/.config/robot/bookmarks'
+
+#json = JSON.parse(File.read('/home/carnager/.config/robot/bookmarks'))
+json = JSON.parse(File.read(bookmarkpath))
+
+def listall(json) json.each {|d| puts "%-40s    %77s   %15s" % [d["name"], d["tags"].join(", "), d["group"]]} end
+def getUrlName(name, json) puts json.detect(Proc.new {print "No results"}) {|d| d['name'].eql? name } .to_h['url'] end
+def getUrlGroup(group, json) puts json.select {|d| d['group'].eql? group} .collect {|d| d['url']} end
+def getUrlTag(tag, json) puts json.select {|d| d['tags'].any? {|t| t.eql? tag}} .collect {|d| d['url']} end
+def getGroups(json) puts json.collect {|d| d["group"]} .uniq end
+def getTags(json) puts json.collect {|d| d["tags"]}.flatten.uniq end
+def listUrlGroup(group, json) puts json.select {|d| d['group'].eql? group} .collect {|d| "%-40s    %77s   %15s" % [d["name"], d["tags"].join(", "), d["group"]]} end
+def listUrlTag(tag, json) puts json.select {|d| d['tags'].any? {|t| t.eql? tag}} .collect {|d| "%-40s    %77s   %15s" % [d["name"], d["tags"].join(", "), d["group"]]} end
+
+options = {}
+new = {}
+OptionParser.new do |opts|
+	opts.on('--type TYPE', [:name, :tag, :group]) {|t| options[:type] = t }
+	opts.on('--list what') {|w| options[:list] = w }
+	opts.on('--geturl what') {|w| options[:get] = w}
+	opts.on('-a', '--listall') {listall(json)}
+	opts.on('-g', '--getgroups') {getGroups(json)}
+	opts.on('-t', '--gettags') {getTags(json)}
+	opts.on('-h', '--help', 'Displays Help') {puts opts}
+	opts.on('--url url') {|u| new[:url] = u}
+	opts.on('--group group') {|g| new[:group] = g}
+	opts.on('--name name') {|n| new[:name] = n}
+	opts.on('--tags tags') {|t| new[:tags] = t.split(' ')}
+	opts.on('--addurl') {options[:add] = true}
+end.parse!
+
+if options.key? :list
+	{:tag => method(:listUrlTag), :group => method(:listUrlGroup)}[options[:type]].call(options[:list], json)
+elsif options.key? :get
+	{:name => method(:getUrlName), :group => method(:getUrlGroup), :tag => method(:getUrlTag)}[options[:type]].call(options[:get], json)
+elsif options[:add]
+	File.open(bookmarkpath, 'w') {|f| JSON.dump(json << new, f)}
+end
