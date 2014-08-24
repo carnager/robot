@@ -27,16 +27,17 @@ def listURL(args):
     bookmarkfile = open(str(bmarks), 'r')
     bookmarks = json.loads(bookmarkfile.read(), 'r')
     bookmarkfile.close()
+    fstr = "%-40s    %77s   %15s"
 
     if args.group:
-        url = [bookmark['name'] + "   " + bookmark['url'] + "   " + ', '.join(bookmark['tags']) + "   " + bookmark['group'] for bookmark in bookmarks if bookmark['group'] == str(args.group)]
-        print("\n".join(url))
+        for x in bookmarks:
+            if x['group'] == str(args.group):
+                print(fstr % (x['name'], ', '.join(x['tags']), x['group']))
 
     if args.tag:
-        url = [bookmark['name'] + "   " + bookmark['url'] + "   " + ', '.join(bookmark['tags']) + "   " + bookmark['group'] for bookmark in bookmarks if args.tag in bookmark['tags']]
-        print("\n".join(url))
-
-
+        for x in bookmarks:
+            if args.tag in x['tags']:
+                print(fstr % (x['name'], ', '.join(x['tags']), x['group']))
 
 def listAll(args):
     bookmarkfile = open(str(bmarks))
