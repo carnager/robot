@@ -4,6 +4,9 @@ Poor man's bookmarks manager utilizing rofi and bash
 It uses a simple directory/file structure.
 Groups are defined with directories and actual bookmarks with files.
 
+It's basically a very stripped down version of rofi-pass, which does
+nothing but open URLs. And without the encryption, of course.
+
 # Screenshot
 ![Screenshot]
 (images/robot.jpg)
