@@ -37,6 +37,12 @@ fi
 
 addBookmark() {
     url=$(echo "" | roficmd -dmenu -mesg "Press Ctrl+v to paste from Clipboard or enter an URL manually" -p "URL > ")
+    val=$?
+    if [[ $val -eq 1 ]]; then
+        exit
+    elif [[ $val -eq 0 ]]; then
+        :
+    fi
     domain=$(python2 -c "from urlparse import urlparse; url = urlparse('$url'); print url.netloc")
     val=$?
     if [[ $val -eq 1 ]]; then
@@ -67,6 +73,13 @@ addBookmark() {
     fi
 }
 
+helpMsg() {
+    echo "robot - poor man's password manager"
+    echo "2015 Rasmus Steinke <rasi at xssn dot at>"
+    echo ""
+    echo "--add    Add a bookmark file"
+}
+
 if [[ -z "$rofiopts" ]]; then
     roficmd () {
         rofi -dmenu "$@"
@@ -76,5 +89,10 @@ else
         rofi -dmenu $(echo "$rofiopts") "$@"
     }
 fi
-
-main
+if [[ $1 == "--add" ]]; then
+    addBookmark
+elif [[ $1 == "--help" || $1 == "-h" ]]; then
+    helpMsg
+else
+    main
+fi
