@@ -1,135 +1,50 @@
-#!/usr/bin/env python
+#!/bin/bash
 
-import os
-import json
-import sys
-import argparse
-import configparser
+source $HOME/.config/robot/config
+cd "${root}"
 
-config = configparser.ConfigParser()
-try:
-    config.read(os.environ["HOME"] + "/.config/robot/config")
-except FileNotFoundError:
-    print("No config file found. Exiting...")
-    sys.exit()
+main () {
+files="$(find . \( ! -regex '.*/\..*' \) -type f \
+    | cut -c 3- \
+    | sed 's/\//\t/1' \
+    | rofi -dmenu -mesg "Enter: Open URL | Alt+e: Edit Entry | Alt+n: Add Bookmark" -kb-custom-1 "Alt+e" -kb-custom-2 "Alt+n" -p "Bookmarks > ")"
 
-bmarks = config['general']['bmarks']
-try:
-    open(bmarks, 'r')
-except FileNotFoundError:
-    open(bmarks, 'w+').write('[]')
-    print("No bookmarkfile found - creating empty one")
-    print("Please run robot again")
-    sys.exit()
+val=$?
 
+if [[ $val -eq 10 ]]; then
+    echo "${files}" | while read line; do
+        $EDITOR "$(echo "${line}" | sed 's/\t/\//1')" &
+    done
+elif [[ $val -eq 0 ]]; then
+    echo "${files}" | while read line; do
+        $BROWSER "$(echo "${line}" | awk -F '\t' '{ print $2 }')"
+    done
+elif [[ $val -eq 1 ]]; then
+    exit
+elif [[ $val -eq 11 ]]; then
+    addBookmark
+fi
+}
 
-def listURL(args):
-    bookmarkfile = open(str(bmarks), 'r')
-    bookmarks = json.loads(bookmarkfile.read(), 'r')
-    bookmarkfile.close()
-    fstr = "%-40s    %77s   %15s"
+addBookmark() {
+    url=$(echo "" | rofi -dmenu -mesg "Press Ctrl+v to paste from Clipboard or enter an URL manually" -p "URL > ")
+    domain=$(python2 -c "from urlparse import urlparse; url = urlparse('$url'); print url.netloc")
+    val=$?
+    if [[ $val -eq 1 ]]; then
+        exit
+    elif [[ $val -eq 0 ]]; then
+        group=$(find . -type d | cut -c 3- | tail -n +2 | rofi -dmenu -p "Group > " -mesg "Choose Group or enter a new one > ")
+        filename=$(echo -e "${domain}" | rofi -dmenu -mesg "Choose Filaname or Enter your own" -p "Filename > ")
+        if [[ $filename == "" ]]; then
+            filename="${domain}"
+        fi
+        if [[ -d "$group" ]]; then
+            echo "${url}" > "${group}/${filename}"
+        else
+            mkdir "${group}"
+            echo "${url}" > "${group}/${filename}"
+        fi
+    fi
+}
 
-    if args.group:
-        for x in bookmarks:
-            if x['group'] == str(args.group):
-                print(fstr % (x['name'], ', '.join(x['tags']), x['group']))
-
-    if args.tag:
-        for x in bookmarks:
-            if args.tag in x['tags']:
-                print(fstr % (x['name'], ', '.join(x['tags']), x['group']))
-
-def listAll(args):
-    bookmarkfile = open(str(bmarks))
-    bookmarks = json.loads(bookmarkfile.read())
-    bookmarkfile.close()
-
-    if args.urls:
-        for x in bookmarks:
-            print("%-40s  %-90s  %77s   %15s" % (x['name'], x['url'], ', '.join(x['tags']), x['group']))
-
-    else:
-        for x in bookmarks:
-            print("%-40s    %77s   %15s" % (x['name'], ', '.join(x['tags']), x['group']))
-
-def addBmarks(args):
-    bookmarkfile = open(str(bmarks), 'r')
-    bookmarks = json.loads(bookmarkfile.read(), 'r')
-    bookmarkfile.close()
-    bookmarkfile = open(str(bmarks), 'w')
-    bookmarks.append({"name": str(args.name), "url": str(args.url), "group": str(args.group), "tags": args.tags.split(" ")})
-    bookmarks_final = json.dumps(bookmarks, sort_keys=True, indent=4, separators=(',', ': '))
-    with open("bookmarks", "w") as text_file:
-        print((bookmarks_final), file=bookmarkfile)
-
-
-def findUrlbyName(args):
-    bookmarkfile = open(str(bmarks), 'r')
-    bookmarks = json.loads(bookmarkfile.read(), 'r')
-    bookmarkfile.close()
-
-    if args.name:
-        url = [bookmark['url'] for bookmark in bookmarks if bookmark['name'] == str(args.name)]
-        print(", ".join(url))
-
-    elif args.group:
-        url = [bookmark['url'] for bookmark in bookmarks if bookmark['group'] == str(args.group)]
-        print("\n".join(url))
-
-    elif args.tag:
-        url = [bookmark['url'] for bookmark in bookmarks if args.tag in bookmark['tags']]
-        print("\n".join(url))
-
-
-def getGroups(args):
-    bookmarkfile = open(str(bmarks), 'r')
-    bookmarks = json.loads(bookmarkfile.read(), 'r')
-    bookmarkfile.close()
-    groups = [bookmark['group'] for bookmark in bookmarks]
-    print("\n".join(groups))
-
-def getTags(args):
-    bookmarkfile = open(str(bmarks), 'r')
-    bookmarks = json.loads(bookmarkfile.read(), 'r')
-    bookmarkfile.close()
-    tags = [bookmark['tags'] for bookmark in bookmarks]
-    tags = [item for sublist in tags for item in sublist]
-    print("\n".join(tags))
-
-
-parser = argparse.ArgumentParser(prog='robot', description='Simple bookmark tool')
-subparsers = parser.add_subparsers()
-
-parser_list = subparsers.add_parser('list', help="list bookmarks by filter")
-parser_list.set_defaults(call=listURL)
-parser_list.add_argument('--group', help="List bookmarks by Groups")
-parser_list.add_argument('--tag', help="List bookmarks by Tags")
-
-parser_listall = subparsers.add_parser('listall', help="list all bookmarks")
-parser_listall.set_defaults(call=listAll)
-parser_listall.add_argument('--urls', help="Include URLs in list")
-
-parser_getgroup = subparsers.add_parser('getgroups', help="List all Groups")
-parser_getgroup.set_defaults(call=getGroups)
-
-parser_gettags = subparsers.add_parser('gettags', help="List all Tags")
-parser_gettags.set_defaults(call=getTags)
-
-parser_add = subparsers.add_parser('add', help="Add a bookmark")
-parser_add.set_defaults(call=addBmarks)
-parser_add.add_argument('--url', help="URL of bookmark")
-parser_add.add_argument('--name', help="Name of bookmark")
-parser_add.add_argument('--tags', help="tags of bookmark")
-parser_add.add_argument('--group', help="group of bookmark")
-
-parser_add = subparsers.add_parser('geturl', help="find url for matching name")
-parser_add.set_defaults(call=findUrlbyName)
-parser_add.add_argument('--name', help="Name of bookmark")
-parser_add.add_argument('--group', help="Group of bookmark")
-parser_add.add_argument('--tag', nargs="?", help="Tag of bookmark")
-
-args = parser.parse_args()
-try:
-    args.call(args)
-except AttributeError:
-    print("No or wrong arguments given. Run robot -h for help")
+main
