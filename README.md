@@ -1,20 +1,29 @@
-## robot - really oafy bookmark organiser tool
-#### (comes with robin - really odd bookmark interface)
+# robot
 
-Simple tool to add or list bookmarks. bookmarks can be searched by title or tags.
+Poor man's bookmarks manager utilizing rofi and bash
+It uses a simple directory/file structure.
+Groups are defined with directories and actual bookmarks with files.
 
+# Screenshot
+![Screenshot]
+(images/robot.jpg)
 
-## Install
+# Features:
 
-Copy config.example to $HOME/.config/robot/config
-and edit the path to bookmark file.
-robot will create the file on first run.
-(For ruby version create a file containing "[]" for now)
-Run robot -h to get all options.
+* Simple directory/file structure
+* Open bookmarks (duh!)
+* Edit bookmarks in Editor
+* Move bookmark files to different groups
 
-## Dependencies:
-* python3 (or ruby for the ruby version, obviously)
+# Dependencies:
 
-##### for the rofi interface:
-* rofi
-* a browser
+* rofi (https://github.com/DaveDavenport/rofi)
+* python2
+
+# Installation
+
+2. Copy config.robot to $HOME/.config/robot/config and edit it.
+3. Copy robot to $PATH
+4. Run robot
+
+For arch linux there is a package in [AUR](https://aur.archlinux.org/packages/robot-git/)
