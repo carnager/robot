@@ -79,7 +79,7 @@ addBookmark() {
     if [[ $gitsupport == "1" ]]; then
         cd "${root}"
         git add "${group}/${filename}"
-        git commit 'Added "${group}/${filename}"'
+        git commit -m "Added ${group}/${filename}"
     fi
 }
 
