@@ -37,3 +37,9 @@ else
     mkdir -p "${group}"
     echo "${url}" > "${group}/${filename}"
 fi
+if [[ -d .git ]]; then
+    cd "${root}"
+    git add "${group}/${filename}"
+    git commit 'Added "${group}/${filename}"'
+fi
+

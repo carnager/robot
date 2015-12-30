@@ -12,6 +12,11 @@ else
 fi
 
 cd "${root}"
+if [[ $gitsupport == "1" ]]; then
+    if [[ ! -d .git ]]; then
+        git init
+    fi
+fi
 
 main () {
 files="$(find . \( ! -regex '.*/\..*' \) -type f \
@@ -70,6 +75,11 @@ addBookmark() {
             mkdir "${group}"
             echo "${url}" > "${group}/${filename}"
         fi
+    fi
+    if [[ $gitsupport == "1" ]]; then
+        cd "${root}"
+        git add "${group}/${filename}"
+        git commit 'Added "${group}/${filename}"'
     fi
 }
 
