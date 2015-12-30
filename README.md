@@ -16,6 +16,7 @@ nothing but open URLs. And without the encryption, of course.
 * Simple directory/file structure
 * Open bookmarks (duh!)
 * Edit bookmarks in Editor
+* Store bookmarks in git repository
 
 # TODO
 
