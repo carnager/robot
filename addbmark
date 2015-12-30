@@ -21,7 +21,7 @@ cd "${root}"
 filename="$2"
 url="$4"
 
-group=$(find . -type d | cut -c 3- | tail -n +2 | rofi -dmenu -p "Group > " -mesg "Choose Group or enter a new one > ")
+group=$(find . \( ! -regex '.*/\..*' \) -type d | cut -c 3- | tail -n +2 | rofi -dmenu -p "Group > " -mesg "Choose Group or enter a new one > ")
 val=$?
 if [[ $val -eq 1 ]]; then
     exit

@@ -48,7 +48,7 @@ addBookmark() {
     if [[ $val -eq 1 ]]; then
         exit
     elif [[ $val -eq 0 ]]; then
-        group=$(find . -type d | cut -c 3- | tail -n +2 | roficmd -dmenu -p "Group > " -mesg "Choose Group or enter a new one > ")
+        group=$(find . \( ! -regex '.*/\..*' \) -type d | cut -c 3- | tail -n +2 | roficmd -dmenu -p "Group > " -mesg "Choose Group or enter a new one > ")
         val=$?
         if [[ $val -eq 1 ]]; then
             exit
