@@ -23,12 +23,20 @@ MSG=""
 OPT=""
 if [[ $gitsupport == "1" ]]
 then
-    MSG=" | Alt+p: Pull/Push changes"
+    MSG="Alt+p: Pull/Push changes"
     OPT="-kb-custom-3 Alt+p"
 fi
+
+        help_text="$(echo -e "Enter: Open URL - Alt+e: Edit Entry\nAlt+n: Add Bookmark - ${MSG}" | column -s '-' -t | perl -pe "s/ - //g")"
+        line1=$(echo "${help_text}" | head -1)
+        line2=$(echo "${help_text}" | tail -1)
+        HELP="${line1}
+${line2}"
+
+
 files="$(find . \( ! -regex '.*/\..*' \) -type f \
     | cut -c 3- \
-    | roficmd -dmenu -mesg "Enter: Open URL | Alt+e: Edit Entry | Alt+n: Add Bookmark ${MSG}" \
+    | roficmd -dmenu -mesg "${HELP}" \
     -kb-custom-1 "Alt+e" -kb-custom-2 "Alt+n" ${OPT} -p "Bookmarks > ")"
 
 val=$?
