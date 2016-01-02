@@ -19,9 +19,17 @@ if [[ $gitsupport == "1" ]]; then
 fi
 
 main () {
+MSG=""
+OPT=""
+if [[ $gitsupport == "1" ]]
+then
+    MSG=" | Alt+p: Pull/Push changes"
+    OPT="-kb-custom-3 Alt+p"
+fi
 files="$(find . \( ! -regex '.*/\..*' \) -type f \
     | cut -c 3- \
-    | roficmd -dmenu -mesg "Enter: Open URL | Alt+e: Edit Entry | Alt+n: Add Bookmark" -kb-custom-1 "Alt+e" -kb-custom-2 "Alt+n" -p "Bookmarks > ")"
+    | roficmd -dmenu -mesg "Enter: Open URL | Alt+e: Edit Entry | Alt+n: Add Bookmark ${MSG}" \
+    -kb-custom-1 "Alt+e" -kb-custom-2 "Alt+n" ${OPT} -p "Bookmarks > ")"
 
 val=$?
 
@@ -37,7 +45,19 @@ elif [[ $val -eq 1 ]]; then
     exit
 elif [[ $val -eq 11 ]]; then
     addBookmark
+elif [[ $val -eq 12 ]]; then
+    pushpullChanges
 fi
+}
+
+pushpullChanges() {
+    if [[ $gitsupport == "1" ]]
+    then
+        cd "${root}"
+        git push
+        git pull
+    fi
+    main
 }
 
 addBookmark() {
