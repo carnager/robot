@@ -3,7 +3,7 @@
 if [[ -f /etc/robot.conf ]]; then
     source /etc/robot.conf
 else
-    echo echo "No global config file found"
+    echo "No global config file found"
 fi
 if [[ -f $HOME/.config/robot/config ]]; then
     source $HOME/.config/robot/config
