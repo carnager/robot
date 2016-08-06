@@ -112,7 +112,7 @@ addBookmark() {
 }
 
 helpMsg() {
-    echo "robot - poor man's password manager"
+    echo "robot - poor man's bookmarks manager"
     echo "2015 Rasmus Steinke <rasi at xssn dot at>"
     echo ""
     echo "--add    Add a bookmark file"
